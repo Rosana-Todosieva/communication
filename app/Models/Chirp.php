@@ -21,4 +21,27 @@ class Chirp extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    // In Chirp.php
+    public function channel()
+    {
+        return $this->belongsTo(Channel::class);
+    }
+
+    protected static function booted()
+    {
+        static::creating(function ($chirp) {
+            if ($chirp->channel_id === null && $chirp->server_id !== null) {
+                // Get the default channel for the server
+                $defaultChannel = Channel::where('server_id', $chirp->server_id)
+                    ->orderBy('id')
+                    ->first();
+
+                if ($defaultChannel) {
+                    $chirp->channel_id = $defaultChannel->id;
+                }
+            }
+        });
+    }
+
 }

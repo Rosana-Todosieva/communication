@@ -3,20 +3,26 @@
 namespace App\Http\Controllers;
 
 use App\Models\Chirp;
+use App\Models\Channel;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class ChirpController extends Controller
 {
     /**
-     * Display a listing of the resource.
-     *
-     * @return \Inertia\Response
-     */
-    public function index()
+ * Fetch messages within a specific channel.
+ *
+ * @param  Request  $request
+ * @param  Channel  $channel
+ * @return \Illuminate\Http\JsonResponse
+ */
+    public function index(Request $request, Channel $channel)
     {
-        return Inertia::render('Chirps/Index', [
-            'chirps' => Chirp::with('user:id,name')->latest()->get(),
+        // Retrieve messages associated with the given channel
+        $messages = Chirp::where('channel_id', $channel->id)->get();
+
+        return response()->json([
+            'messages' => $messages,
         ]);
     }
 
